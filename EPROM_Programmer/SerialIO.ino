@@ -6,7 +6,7 @@ static const String   PROGRAM_DATE      = "12th April 2024.";
 static const uint16_t STR_BUFFER_SIZE   = 80;       // Size of temporary buffer for sprintf()
 static const uint32_t BAUD_RATE         = 921600;   // Serial port BAUD rate
 static const uint32_t SERIAL_TIMEOUT    = 10000;    // Command timeout length in milliseconds
-static const uint8_t  COMMAND_NUM       = 14;       // Number of commands in command list array
+static const uint8_t  COMMAND_NUM       = 16;       // Number of commands in command list array
 
 // List of serial protocol commands
 // ================================
@@ -16,8 +16,10 @@ static const uint8_t  COMMAND_NUM       = 14;       // Number of commands in com
 //
 // CMD_ID  char   Function            Bytes   Input/Output             Description
 // =====================================================================================================================================
-// SDBLSZ  [b|B]  Set data block size   (2)   -> (WORD <= 0x1000)      Set size of data block for binary data transfers (Up to 4KBytes)
-// GDEVID  [d|D]  Get device ID         (0)   <- (BYTE:BYTE)           Get the manufacturer and device ID for EPROM
+// SBINRY  [B]    Set binary mode       (0)                            Set data transfer to binary mode
+// SASCII  [A]    Set ASCII mode        (0)                            Set data transfer to ASCII mode
+// SDBLSZ  [d|D]  Set data block size   (2)   -> (WORD <= 0x1000)      Set size of data block for binary data transfers (Up to 4KBytes)
+// GDEVID  [i|I]  Get device ID         (0)   <- (BYTE:BYTE)           Get the manufacturer and device ID for EPROM
 // SSADDR  [s]    Set start address     (5)   -> (DWORD < 0x6ffff)     Set the start address for future commands
 // SEADDR  [S]    Set end address       (1)   -> (BYTE)                Set the end address of EPROM in 4K banks
 // RDBYTE  [r]    Read data byte        (0)   <- (BYTE)                Read EPROM byte from current address
@@ -28,13 +30,11 @@ static const uint8_t  COMMAND_NUM       = 14;       // Number of commands in com
 // GCRC32  [g]    Get EPROM CRC         (1)   -> (BYTE) <- (char[16])  Calculate CRC32 hash value of BYTE num. of blocks
 // GSHA_1  [G]    Get EPROM SHA-1       (1)   -> (BYTE) <- (char[40])  Calculate SHA-1 hash value of BYTE num. of blocks
 // =====================================================================================================================================
-//
-// Receive 'Y' on success, 'Q' on failue
 
 // Command_ID identifiers
-enum CmdID { SDBLSZ, GDEVID, SSADDR, SEADDR, RDBYTE, RDBLCK, WDBLCK, EEBANK, EEPROM, GCRC32, GSHA_1 };
+enum CmdID { SBINRY, SASCII, SDBLSZ, GDEVID, SSADDR, SEADDR, RDBYTE, RDBLCK, WDBLCK, EEBANK, EEPROM, GCRC32, GSHA_1 };
 
-String cmdDesc[COMMAND_NUM] = { "SDBLSZ", "GDEVID", "SSADDR", "SEADDR", "RDBYTE", "RDBLCK", "WDBLCK", "EEBANK", "EEPROM", "GCRC32", "GSHA-1" };
+String cmdDesc[COMMAND_NUM] = { "SBINRY", "SASCII", "SDBLSZ", "GDEVID", "SSADDR", "SEADDR", "RDBYTE", "RDBLCK", "WDBLCK", "EEBANK", "EEPROM", "GCRC32", "GSHA-1" };
 
 // Command structure
 struct Command {
@@ -44,8 +44,9 @@ struct Command {
 };
 
 // List of serial protocol commands
-Command cmdList[COMMAND_NUM] = { { 'b',  4, SDBLSZ}, { 'B',  4, SDBLSZ},
-                                 { 'd',  0, GDEVID}, { 'D',  0, GDEVID},
+Command cmdList[COMMAND_NUM] = { { 'B',  0, SBINRY}, { 'A',  0, SASCII},
+                                 { 'd',  4, SDBLSZ}, { 'D',  4, SDBLSZ},
+                                 { 'i',  0, GDEVID}, { 'I',  0, GDEVID},
                                  { 's',  5, SSADDR}, { 'S',  1, SEADDR},
                                  { 'r',  0, RDBYTE}, { 'R',  0, RDBLCK},
                                  { 'w', -1, WDBLCK}, { 'W', -1, WDBLCK},
@@ -53,6 +54,11 @@ Command cmdList[COMMAND_NUM] = { { 'b',  4, SDBLSZ}, { 'B',  4, SDBLSZ},
                                  { 'g',  1, GCRC32}, { 'G',  1, GSHA_1} };
 
 int8_t cmdB = 0;    // Index of the current command being executed in command list
+
+// Data transfer mode types
+enum TransferMode { BINARY, ASCII };
+
+TransferMode transferMode = ASCII;    // Current transfer mode
 
 // State machine program states
 enum PState { ERROR,
