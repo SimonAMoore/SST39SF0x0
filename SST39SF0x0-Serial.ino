@@ -1,4 +1,4 @@
-const static String   PROGRAM_TITLE     = "Flash EPROM Programmer";
+const static String   PROGRAM_TITLE     = "SST39SF0x0 Flash EPROM Programmer";
 const static String   PROGRAM_COPYRIGHT = "(C) Simon Moore. All Rights Reserved.";
 const static String   PROGRAM_VERSION   = "Version 1.0.2";
 const static String   PROGRAM_DATE      = "12th April 2024.";
