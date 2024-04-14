@@ -39,13 +39,13 @@ struct Command {
 };
 
 // List of serial protocol commands
-Command commandList[COMMAND_NUM] = { { 'b',  4, SDBLSZ}, { 'B',  4, SDBLSZ},
-                                     { 'd',  0, GDEVID}, { 'D',  0, GDEVID},
-                                     { 's',  5, SSADDR}, { 'S',  5, SSADDR},
-                                     { 'r',  0, RDBYTE}, { 'R',  0, RDBLCK},
-                                     { 'w', -1, WDBLCK}, { 'W', -1, WDBLCK},
-                                     { 'e',  4, EEBANK}, { 'E', 16, EEPROM},
-                                     { 'g',  1, GCRC32}, { 'G',  1, GSHA_1} };
+Command cmdList[COMMAND_NUM] = { { 'b',  4, SDBLSZ}, { 'B',  4, SDBLSZ},
+                                 { 'd',  0, GDEVID}, { 'D',  0, GDEVID},
+                                 { 's',  5, SSADDR}, { 'S',  5, SSADDR},
+                                 { 'r',  0, RDBYTE}, { 'R',  0, RDBLCK},
+                                 { 'w', -1, WDBLCK}, { 'W', -1, WDBLCK},
+                                 { 'e',  4, EEBANK}, { 'E', 16, EEPROM},
+                                 { 'g',  1, GCRC32}, { 'G',  1, GSHA_1} };
 
 int8_t cmdB = 0;    // Current command index into command list
 
@@ -104,10 +104,10 @@ void loop() {
 
         // Parse command character
         for (uint8_t i = 0; i < COMMAND_NUM; i++) {
-          if (c == commandList[i].c) {
+          if (c == cmdList[i].c) {
             cmdB = i;
             // Set next program state based on command's data byte length
-            switch (commandList[i].d) {
+            switch (cmdList[i].d) {
               default:
                 pState = WAIT_CMD_D;
                 break;
@@ -128,20 +128,20 @@ void loop() {
 
     // Waiting for command data
     case WAIT_CMD_D:
-      Serial.println("WAIT_CMD_D");           // For DEBUG
-      Serial.println(commandList[cmdB].str);  // For DEBUG
+      Serial.println("WAIT_CMD_D");       // For DEBUG
+      Serial.println(cmdList[cmdB].str);  // For DEBUG
       break;
 
     // Receive binary data block
     case RECV_DBLOCK:
-      Serial.println("RECV_DBLOCK");          // For DEBUG
-      Serial.println(commandList[cmdB].str);  // For DEBUG
+      Serial.println("RECV_DBLOCK");      // For DEBUG
+      Serial.println(cmdList[cmdB].str);  // For DEBUG
       break;
 
     // Execute command function
     case CMD_RUN:
-      Serial.println("CMD_RUN");              // For DEBUG
-      Serial.println(commandList[cmdB].str);  // For DEBUG
+      Serial.println("CMD_RUN");          // For DEBUG
+      Serial.println(cmdList[cmdB].str);  // For DEBUG
       break;
   }
 
