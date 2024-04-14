@@ -1,12 +1,12 @@
-const static String   PROGRAM_TITLE     = "SST39SF0x0 Flash EPROM Programmer";
-const static String   PROGRAM_COPYRIGHT = "(C) Simon Moore. All Rights Reserved.";
-const static String   PROGRAM_VERSION   = "Version 1.0.2";
-const static String   PROGRAM_DATE      = "12th April 2024.";
+static const String   PROGRAM_TITLE     = "SST39SF0x0 Flash EPROM Programmer";
+static const String   PROGRAM_COPYRIGHT = "(C) Simon Moore. All Rights Reserved.";
+static const String   PROGRAM_VERSION   = "Version 1.0.2";
+static const String   PROGRAM_DATE      = "12th April 2024.";
 
-const static uint16_t STR_BUFFER_SIZE   = 80;       // Size of temporary buffer for sprintf()
-const static uint32_t BAUD_RATE         = 921600;   // Serial port BAUD rate
-const static uint32_t SERIAL_TIMEOUT    = 10000;    // Command timeout length in milliseconds
-const static uint8_t  COMMAND_NUM       = 14;       // Number of commands in command list array
+static const uint16_t STR_BUFFER_SIZE   = 80;       // Size of temporary buffer for sprintf()
+static const uint32_t BAUD_RATE         = 921600;   // Serial port BAUD rate
+static const uint32_t SERIAL_TIMEOUT    = 10000;    // Command timeout length in milliseconds
+static const uint8_t  COMMAND_NUM       = 14;       // Number of commands in command list array
 
 // List of serial protocol commands
 // ================================
