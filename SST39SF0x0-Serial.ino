@@ -14,36 +14,38 @@ const static uint8_t  COMMAND_NUM       = 14;       // Number of commands in com
 // Send handshake character 'z'
 // Receive acknowledge character 'Z'
 //
-// CMD_ID char   Function            Bytes  Input/Output            Description
-// ==================================================================================================================================
-// SDBLSZ [b|B]  Set data block size  (4)   -> (WORD <= 0x1000)     Set size of data block for binary data transfers (Up to 4KBytes)
-// GDEVID [d|D]  Get device id        (0)   <- (BYTE:BYTE)          Get the manufacturer and device ID for EPROM
-// SSADDR [s|S]  Set start address    (5)   -> (DWORD < 0x6ffff)    Set the start address for future commands
-// RDBYTE [r]    Read data byte       (0)   <- (BYTE)               Read EPROM byte from current address
-// RDBLCK [R]    Read data block      (0)   <- (Data Block)         Read EPROM block from current address
-// WDBLCK [w|W]  Write data block     (D)   -> (Data Block)         Write block of data starting at current address
-// EEBANK [e]    Erase EPROM bank     (4)   -> (DWORD)              Erase bank of EPROM at address (bank masked) if data = 0xaa55aa55
-// EEPROM [E]    Erase EPROM         (16)   -> (String[16])         Erase entire EPROM if data matches CRC32 hash value
-// GCRC32 [g]    Get EPROM CRC        (0)   <- (String[16])         Get EPROM's CRC32 hash value
-// GSHA-1 [G]    Get EPROM SHA-1      (0)   <- (String[40])         Get EPROM's SHA-1 hash value
-// ==================================================================================================================================
+// CMD_ID char   Function            Bytes   Input/Output             Description
+// ====================================================================================================================================
+// SDBLSZ [b|B]  Set data block size   (4)   -> (WORD <= 0x1000)      Set size of data block for binary data transfers (Up to 4KBytes)
+// GDEVID [d|D]  Get device id         (0)   <- (BYTE:BYTE)           Get the manufacturer and device ID for EPROM
+// SSADDR [s|S]  Set start address     (5)   -> (DWORD < 0x6ffff)     Set the start address for future commands
+// RDBYTE [r]    Read data byte        (0)   <- (BYTE)                Read EPROM byte from current address
+// RDBLCK [R]    Read data block       (0)   <- (Data Block)          Read EPROM block from current address
+// WDBLCK [w|W]  Write data block      (D)   -> (Data Block)          Write block of data starting at current address
+// EEBANK [e]    Erase EPROM bank      (4)   -> (DWORD)               Erase bank of EPROM at address (bank masked) if data = 0xaa55aa55
+// EEPROM [E]    Erase EPROM          (16)   -> (char[16])            Erase entire EPROM if data matches CRC32 hash value
+// GCRC32 [g]    Get EPROM CRC         (1)   -> (BYTE) <- (char[16])  Get no. of blocks of EPROM CRC32 hash value
+// GSHA_1 [G]    Get EPROM SHA-1       (1)   -> (BYTE) <- (char[40])  Get no. of blocks of EPROM SHA-1 hash value
+// ====================================================================================================================================
+
+// Command ID string
+enum CmdID { SDBLSZ, GDEVID, SSADDR, RDBYTE, RDBLCK, WDBLCK, EEBANK, EEPROM, GCRC32, GSHA_1 };
 
 // Command structure
 struct Command {
   char    c;    // command character code
   int8_t  d;    // Size of data in bytes (-1 for binary data block)
-  String  str;  // Command ID string
+  CmdID   id;   // Command ID
 };
 
 // List of serial protocol commands
-Command commandList[COMMAND_NUM] = { { 'b',  4, "SDBLSZ"}, { 'B',  4, "SDBLSZ"},
-                                     { 'd',  0, "GDEVID"}, { 'D',  0, "GDEVID"},
-                                     { 's',  5, "SSADDR"}, { 'S',  5, "SSADDR"},
-                                     { 'r',  0, "RDBYTE"}, { 'R',  0, "RDBLCK"},
-                                     { 'w', -1, "WDBLCK"}, { 'W', -1, "WDBLCK"},
-                                     { 'e',  4, "EEBANK"}, { 'E', 16, "EEPROM"},
-                                     { 'g',  0, "GCRC32"}, { 'G',  0, "GSHA-1"}
-                                    };
+Command commandList[COMMAND_NUM] = { { 'b',  4, SDBLSZ}, { 'B',  4, SDBLSZ},
+                                     { 'd',  0, GDEVID}, { 'D',  0, GDEVID},
+                                     { 's',  5, SSADDR}, { 'S',  5, SSADDR},
+                                     { 'r',  0, RDBYTE}, { 'R',  0, RDBLCK},
+                                     { 'w', -1, WDBLCK}, { 'W', -1, WDBLCK},
+                                     { 'e',  4, EEBANK}, { 'E', 16, EEPROM},
+                                     { 'g',  1, GCRC32}, { 'G',  1, GSHA_1} };
 
 int8_t cmdB = 0;    // Current command index into command list
 
