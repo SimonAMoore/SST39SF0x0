@@ -115,7 +115,7 @@ main:
     ; Enable PORTA pins as outputs
     clrf   TRISA, c
 
-    ; Initialise PORTB and PORTC as all outputs (Input ONLY on RC4, RC5)
+    ; Initialise PORTB and PORTC as all outputs (RC4 & RC5 are input only pins)
     clrf    PORTB, c
     clrf    LATB, c
     clrf    TRISB, c
