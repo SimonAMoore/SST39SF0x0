@@ -129,19 +129,16 @@ void loop() {
     // Waiting for command data
     case WAIT_CMD_D:
       Serial.println("WAIT_CMD_D");       // For DEBUG
-      Serial.println(cmdList[cmdB].str);  // For DEBUG
       break;
 
     // Receive binary data block
     case RECV_DBLOCK:
       Serial.println("RECV_DBLOCK");      // For DEBUG
-      Serial.println(cmdList[cmdB].str);  // For DEBUG
       break;
 
     // Execute command function
     case CMD_RUN:
       Serial.println("CMD_RUN");          // For DEBUG
-      Serial.println(cmdList[cmdB].str);  // For DEBUG
       break;
   }
 
