@@ -1,4 +1,4 @@
-; EPROM Programmer, shift register and counter for address lines on 2764 EPROM
+; EPROM Programmer, shift register and counter for address lines on SST39SF0x0 Flash ROMS
 ;
 ; (C) Simon Moore 2024. All Rights Reserved.
 ;
