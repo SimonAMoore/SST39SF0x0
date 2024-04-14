@@ -16,7 +16,7 @@ const static uint8_t  COMMAND_NUM       = 14;       // Number of commands in com
 //
 // CMD_ID  char   Function            Bytes   Input/Output             Description
 // =====================================================================================================================================
-// SDBLSZ  [b|B]  Set data block size   (4)   -> (WORD <= 0x1000)      Set size of data block for binary data transfers (Up to 4KBytes)
+// SDBLSZ  [b|B]  Set data block size   (2)   -> (WORD <= 0x1000)      Set size of data block for binary data transfers (Up to 4KBytes)
 // GDEVID  [d|D]  Get device ID         (0)   <- (BYTE:BYTE)           Get the manufacturer and device ID for EPROM
 // SSADDR  [s]    Set start address     (5)   -> (DWORD < 0x6ffff)     Set the start address for future commands
 // SEADDR  [S]    Set end address       (1)   -> (BYTE)                Set the end address of EPROM in 4K banks
