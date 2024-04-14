@@ -160,4 +160,5 @@ void HALT(String msg) {
   Serial.println("\nHALTED: " + msg);
   Serial.flush();
   Serial.end();
+  while(1);
 }
