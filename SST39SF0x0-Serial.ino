@@ -24,8 +24,8 @@ const static uint8_t  COMMAND_NUM       = 14;       // Number of commands in com
 // WDBLCK  [w|W]  Write data block      (D)   -> (Data Block)          Write block of data starting at current address
 // EEBANK  [e]    Erase EPROM bank      (4)   -> (DWORD)               Erase bank of EPROM at address (bank masked) if data = 0xaa55aa55
 // EEPROM  [E]    Erase EPROM          (16)   -> (char[16])            Erase entire EPROM if data matches CRC32 hash value
-// GCRC32  [g]    Get EPROM CRC         (1)   -> (BYTE) <- (char[16])  Get no. of blocks of EPROM CRC32 hash value
-// GSHA_1  [G]    Get EPROM SHA-1       (1)   -> (BYTE) <- (char[40])  Get no. of blocks of EPROM SHA-1 hash value
+// GCRC32  [g]    Get EPROM CRC         (1)   -> (BYTE) <- (char[16])  Calculate CRC32 hash value of BYTE num. of blocks
+// GSHA_1  [G]    Get EPROM SHA-1       (1)   -> (BYTE) <- (char[40])  Calculate SHA-1 hash value of BYTE num. of blocks
 // =====================================================================================================================================
 
 // Command ID string
