@@ -113,8 +113,7 @@ main:
     movlw   0x07	
     movwf   CMCON, c
     ; Enable PORTA pins as outputs
-    movlw   00000000B
-    movwf   TRISA, c
+    clrf   TRISA, c
 
     ; Initialise PORTB and PORTC as all outputs (Input ONLY on RC4, RC5)
     clrf    PORTB, c
