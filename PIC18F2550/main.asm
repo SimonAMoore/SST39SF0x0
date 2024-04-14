@@ -7,20 +7,20 @@
 ;
 ;		               18f2550
 ;		    +-------------v------------+
-;	 MODE_IN -> :  1 RE3		RB7 28 : -> A12
-;	     A13 <- :  2 RA0		RB6 27 : -> A11
-;	     A14 <- :  3 RA1		RB5 26 : -> A10
-;	     A15 <- :  4 RA2		RB4 25 : -> A9
-;	     A16 <- :  5 RA3		RB3 24 : -> A8
-;	     A17 <- :  6 RA4		RB2 23 : -> A7
-;	     A18 <- :  7 RA5		RB1 22 : -> A6
-;	VSS (0V) -> :  8		RB0 21 : -> A5
-;		    :  9		    20 : <- VDD (5V)
-;      Clock Out <- : 10 RA6		    19 : <- VSS (0V)
-;	      A0 <- : 11 RC0		RC7 18 : -> A4
-;	      A1 <- : 12 RC1		RC6 17 : -> A3
-;	      A2 <- : 13 RC2		RC5 16 : <- CLK_IN!
-;		    : 14		RC4 15 : <- DATA_IN!
+;	 MODE_IN -> |  1 RE3		RB7 28 | -> A12
+;	     A13 <- |  2 RA0		RB6 27 | -> A11
+;	     A14 <- |  3 RA1		RB5 26 | -> A10
+;	     A15 <- |  4 RA2		RB4 25 | -> A9
+;	     A16 <- |  5 RA3		RB3 24 | -> A8
+;	     A17 <- |  6 RA4		RB2 23 | -> A7
+;	     A18 <- |  7 RA5		RB1 22 | -> A6
+;	VSS (0V) -> |  8		RB0 21 | -> A5
+;		    |  9		    20 | <- VDD (5V)
+;      Clock Out <- | 10 RA6		    19 | <- VSS (0V)
+;	      A0 <- | 11 RC0		RC7 18 | -> A4
+;	      A1 <- | 12 RC1		RC6 17 | -> A3
+;	      A2 <- | 13 RC2		RC5 16 | <- CLK_IN!
+;		    | 14		RC4 15 | <- DATA_IN!
 ;		    +--------------------------+
 ;
 ;   Rom Bank	    Rom Address High			Rom Address Low
