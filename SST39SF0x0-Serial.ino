@@ -17,19 +17,20 @@ const static uint8_t  COMMAND_NUM       = 14;       // Number of commands in com
 // CMD_ID  char   Function            Bytes   Input/Output             Description
 // =====================================================================================================================================
 // SDBLSZ  [b|B]  Set data block size   (4)   -> (WORD <= 0x1000)      Set size of data block for binary data transfers (Up to 4KBytes)
-// GDEVID  [d|D]  Get device id         (0)   <- (BYTE:BYTE)           Get the manufacturer and device ID for EPROM
-// SSADDR  [s|S]  Set start address     (5)   -> (DWORD < 0x6ffff)     Set the start address for future commands
+// GDEVID  [d|D]  Get device ID         (0)   <- (BYTE:BYTE)           Get the manufacturer and device ID for EPROM
+// SSADDR  [s]    Set start address     (5)   -> (DWORD < 0x6ffff)     Set the start address for future commands
+// SEADDR  [S]    Set end address       (1)   -> (BYTE)                Set the end address of EPROM in 4K banks
 // RDBYTE  [r]    Read data byte        (0)   <- (BYTE)                Read EPROM byte from current address
-// RDBLCK  [R]    Read data block       (0)   <- (Data Block)          Read EPROM block from current address
+// RDBLCK  [R]    Read data block       (0)   <- (Data Block)          Read EPROM block from current bank-masked-address
 // WDBLCK  [w|W]  Write data block      (D)   -> (Data Block)          Write block of data starting at current address
-// EEBANK  [e]    Erase EPROM bank      (4)   -> (DWORD)               Erase bank of EPROM at address (bank masked) if data = 0xaa55aa55
+// EEBANK  [e]    Erase EPROM bank      (4)   -> (DWORD)               Erase single 4KB bank of EPROM at address if DWORD = 0xaa55aa55
 // EEPROM  [E]    Erase EPROM          (16)   -> (char[16])            Erase entire EPROM if data matches CRC32 hash value
 // GCRC32  [g]    Get EPROM CRC         (1)   -> (BYTE) <- (char[16])  Calculate CRC32 hash value of BYTE num. of blocks
 // GSHA_1  [G]    Get EPROM SHA-1       (1)   -> (BYTE) <- (char[40])  Calculate SHA-1 hash value of BYTE num. of blocks
 // =====================================================================================================================================
 
-// Command ID string
-enum CmdID { SDBLSZ, GDEVID, SSADDR, RDBYTE, RDBLCK, WDBLCK, EEBANK, EEPROM, GCRC32, GSHA_1 };
+// Command_ID identifiers
+enum CmdID { SDBLSZ, GDEVID, SSADDR, SEADDR, RDBYTE, RDBLCK, WDBLCK, EEBANK, EEPROM, GCRC32, GSHA_1 };
 
 // Command structure
 struct Command {
@@ -41,13 +42,13 @@ struct Command {
 // List of serial protocol commands
 Command cmdList[COMMAND_NUM] = { { 'b',  4, SDBLSZ}, { 'B',  4, SDBLSZ},
                                  { 'd',  0, GDEVID}, { 'D',  0, GDEVID},
-                                 { 's',  5, SSADDR}, { 'S',  5, SSADDR},
+                                 { 's',  5, SSADDR}, { 'S',  1, SEADDR},
                                  { 'r',  0, RDBYTE}, { 'R',  0, RDBLCK},
                                  { 'w', -1, WDBLCK}, { 'W', -1, WDBLCK},
                                  { 'e',  4, EEBANK}, { 'E', 16, EEPROM},
                                  { 'g',  1, GCRC32}, { 'G',  1, GSHA_1} };
 
-int8_t cmdB = 0;    // Current command index into command list
+int8_t cmdB = 0;    // Index of the current command being executed in command list
 
 // State machine program states
 enum PState { ERROR,
@@ -78,7 +79,7 @@ void loop() {
     // Device error state.
     default:
     case ERROR:
-      HALT("HALTED: Device Error State");
+      HALT("Device Error State");
       break;
 
     // Waiting for handshake character 'z'
@@ -106,16 +107,19 @@ void loop() {
         for (uint8_t i = 0; i < COMMAND_NUM; i++) {
           if (c == cmdList[i].c) {
             cmdB = i;
-            // Set next program state based on command's data byte length
+            // Set next program state based on command's data byte length (d)
             switch (cmdList[i].d) {
+              // Default is to expect a series of data bytes of length d
               default:
                 pState = WAIT_CMD_D;
                 break;
-              
+
+              // If (d = -1) then command is receiving a binary data block
               case -1:
                 pState = RECV_DBLOCK;
                 break;
 
+              // If (d = 0) then command does not have any data bytes
               case 0:
                 pState = CMD_RUN;
                 break;
@@ -153,7 +157,7 @@ void loop() {
 }
 
 void HALT(String msg) {
-  Serial.println(msg);
+  Serial.println("\nHALTED: " + msg);
   Serial.flush();
   Serial.end();
 }
