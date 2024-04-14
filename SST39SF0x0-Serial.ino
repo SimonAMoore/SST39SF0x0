@@ -14,7 +14,7 @@ const static uint8_t  COMMAND_NUM       = 14;       // Number of commands in com
 // Send handshake character 'z'
 // Receive acknowledge character 'Z'
 //
-// CMD_ID char   Function            Bytes  Input/Output         Description
+// CMD_ID char   Function            Bytes  Input/Output            Description
 // ==================================================================================================================================
 // SDBLSZ [b|B]  Set data block size  (4)   -> (WORD <= 0x1000)     Set size of data block for binary data transfers (Up to 4KBytes)
 // GDEVID [d|D]  Get device id        (0)   <- (BYTE:BYTE)          Get the manufacturer and device ID for EPROM
