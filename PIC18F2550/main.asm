@@ -146,7 +146,7 @@ pollButtons:
     goto    operatingMode
 
 setMode:
-    ; Read DATA_IN input into mode register
+    ; If DATA_IN = 0 reset regist, otherwise transfer DATA_IN into mode register
     clrf    mode, b
     btfss   DATA_IN
     goto    setModeReset
@@ -156,11 +156,9 @@ setMode:
 
 setModeReset:
     ; Reset mode and registers to power on defaults
-    ;clrf    mode, b
     clrf    addrIn_L, b
     clrf    addrIn_H, b
     clrf    addrIn_Bank, b
-    ;call    updateOutput
 
     goto    pollButtonsSkip
 
