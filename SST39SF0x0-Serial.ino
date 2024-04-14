@@ -16,8 +16,8 @@ const static uint8_t  COMMAND_NUM       = 14;       // Number of commands in com
 //
 // CMD_ID char   Function            Bytes  Input/Output         Description
 // ==================================================================================================================================
-// SDBLSZ [b|B]  Set data block size  (4)   -> (WORD <= 0x1000)     Set size of data block for binary data transfers
-// GDEVID [d|D]  Get device id        (0)   <- (WORD:WORD)          Get the manufacturer and device ID for EPROM
+// SDBLSZ [b|B]  Set data block size  (4)   -> (WORD <= 0x1000)     Set size of data block for binary data transfers (Up to 4KBytes)
+// GDEVID [d|D]  Get device id        (0)   <- (BYTE:BYTE)          Get the manufacturer and device ID for EPROM
 // SSADDR [s|S]  Set start address    (5)   -> (DWORD < 0x6ffff)    Set the start address for future commands
 // RDBYTE [r]    Read data byte       (0)   <- (BYTE)               Read EPROM byte from current address
 // RDBLCK [R]    Read data block      (0)   <- (Data Block)         Read EPROM block from current address
@@ -99,7 +99,6 @@ void loop() {
 
         // Set program state to idle in case no valid command parsed
         pState = IDLE;
-        cmdB = 0;
 
         // Parse command character
         for (uint8_t i = 0; i < COMMAND_NUM; i++) {
@@ -127,26 +126,26 @@ void loop() {
 
     // Waiting for command data
     case WAIT_CMD_D:
-      Serial.println("WAIT_CMD_D");
-      Serial.println(commandList[cmdB].str);
+      Serial.println("WAIT_CMD_D");           // For DEBUG
+      Serial.println(commandList[cmdB].str);  // For DEBUG
       break;
 
     // Receive binary data block
     case RECV_DBLOCK:
-      Serial.println("RECV_DBLOCK");
-      Serial.println(commandList[cmdB].str);
+      Serial.println("RECV_DBLOCK");          // For DEBUG
+      Serial.println(commandList[cmdB].str);  // For DEBUG
       break;
 
     // Execute command function
     case CMD_RUN:
-      Serial.println("CMD_RUN");
-      Serial.println(commandList[cmdB].str);
+      Serial.println("CMD_RUN");              // For DEBUG
+      Serial.println(commandList[cmdB].str);  // For DEBUG
       break;
   }
 
   // If timer exceeds timeout value, reset program state to idle
   if (millis() - lastMillis > SERIAL_TIMEOUT) {
-    Serial.println("IDLE");
+    Serial.println("IDLE");    // For DEBUG
     pState = IDLE;
   }
 
