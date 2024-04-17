@@ -2,8 +2,6 @@ const uint8_t ROM_OE = A3;  // EPROM output enable, active low. G=0 Read mode, G
 const uint8_t ROM_CE = A4;  // EPROM chip enable, active low. E=0, ROM enabled
 const uint8_t ROM_WE = A5;  // EPROM write enable, active low. 
 
-//const uint32_t EPROM_DELAY = 5; // Delay in microseconds between successive EPROM commands
-
 const uint8_t DQ0 = 4;  // EPROM data bit 0, pin PD4 Arduino UNO
 const uint8_t DQ1 = 5;  // EPROM data bit 1, pin PD5 Arduino UNO
 const uint8_t DQ2 = 6;  // EPROM data bit 2, pin PD6 Arduino UNO

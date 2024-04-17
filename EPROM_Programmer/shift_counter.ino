@@ -12,7 +12,10 @@ void SCR_setAddress(uint32_t address) {
 
 // Shift 19-bit bank:address into shift-register
 void SCR_setAddress(uint8_t bank, uint16_t address) {
- // Set address bank bits
+  // Reset shift register
+  SCR_reset();
+  
+  // Set address bank bits
   for (int position = 2; position >= 0; position--) {
     // Get individual bits from address
     uint8_t bit = (bank & bit(position)) != 0;

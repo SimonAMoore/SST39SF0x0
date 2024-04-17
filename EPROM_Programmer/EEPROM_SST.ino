@@ -28,19 +28,19 @@
 
 static const uint16_t POLL_COUNT = 0x7fff;
 
-void EPROM_SST_ID_Entry() {
+void EPROM_SST_IDEntry() {
   SCR_setAddress(0x05555); EPROM_writeByte(0xaa);
   SCR_setAddress(0x02aaa); EPROM_writeByte(0x55);
   SCR_setAddress(0x05555); EPROM_writeByte(0x90);
 }
 
-void EPROM_SST_ID_Exit() {
+void EPROM_SST_IDExit() {
   SCR_setAddress(0x05555); EPROM_writeByte(0xaa);
   SCR_setAddress(0x02aaa); EPROM_writeByte(0x55);
   SCR_setAddress(0x05555); EPROM_writeByte(0xf0);
 }
 
-bool EPROM_SST_byte_Program(uint32_t address, uint8_t data) {
+bool EPROM_SST_byteProgram(uint32_t address, uint8_t data) {
   SCR_setAddress(0x05555); EPROM_writeByte(0xaa);
   SCR_setAddress(0x02aaa); EPROM_writeByte(0x55);
   SCR_setAddress(0x05555); EPROM_writeByte(0xa0);
@@ -49,9 +49,11 @@ bool EPROM_SST_byte_Program(uint32_t address, uint8_t data) {
   return EPROM_writeByte(data);
 }
 
-bool EPROM_SST_sector_Erase(uint32_t address) {
-  Serial.print("Erasing sector at address: 0x");
-  Serial.print(address, HEX);
+bool EPROM_SST_sectorErase(uint32_t address, bool suppressOutput) {
+  if (!suppressOutput) {
+    Serial.print("Erasing sector at address: 0x");
+    Serial.print(address, HEX);
+  }
 
   SCR_setAddress(0x05555); EPROM_writeByte(0xaa);
   SCR_setAddress(0x02aaa); EPROM_writeByte(0x55);
@@ -60,15 +62,15 @@ bool EPROM_SST_sector_Erase(uint32_t address) {
   SCR_setAddress(0x02aaa); EPROM_writeByte(0x55);
   SCR_setAddress(address); EPROM_writeByte(0x30);
 
-  bool result = EPROM_SST_data_Polling();
+  bool result = EPROM_SST_dataPolling();
 
-  Serial.println(result ? " [SUCCESS]\n" : " [FAILED]\n");
+  if (!suppressOutput) Serial.println(result ? " [SUCCESS]\n" : " [FAILED]\n");
 
   return result;
 }
 
-bool EPROM_SST_chip_Erase() {
-  Serial.print("Erasing EPROM...");
+bool EPROM_SST_chipErase(bool suppressOutput) {
+  if (!suppressOutput) Serial.print("Erasing EPROM...");
 
   SCR_setAddress(0x05555); EPROM_writeByte(0xaa);
   SCR_setAddress(0x02aaa); EPROM_writeByte(0x55);
@@ -77,14 +79,14 @@ bool EPROM_SST_chip_Erase() {
   SCR_setAddress(0x02aaa); EPROM_writeByte(0x55);
   SCR_setAddress(0x05555); EPROM_writeByte(0x10);
 
-  bool result = EPROM_SST_data_Polling();
+  bool result = EPROM_SST_dataPolling();
 
-  Serial.println(result ? " [SUCCESS]\n" : " [FAILED]\n");
+  if (!suppressOutput) Serial.println(result ? " [SUCCESS]\n" : " [FAILED]\n");
 
   return result;
 }
 
-bool EPROM_SST_data_Polling() {
+bool EPROM_SST_dataPolling() {
   bool result = false;
 
   EPROM_readMode();
@@ -101,12 +103,12 @@ bool EPROM_SST_data_Polling() {
 uint8_t EPROM_SST_manufacturerID() {
   uint8_t ID = 0;
 
-  EPROM_SST_ID_Entry();
+  EPROM_SST_IDEntry();
   SCR_setAddress(0x00000);
   EPROM_readMode();
   ID = EPROM_readByte();
   EPROM_idleMode();
-  EPROM_SST_ID_Exit();
+  EPROM_SST_IDExit();
 
   return ID;
 }
@@ -114,12 +116,12 @@ uint8_t EPROM_SST_manufacturerID() {
 uint8_t EPROM_SST_deviceID() {
   uint8_t ID = 0;
 
-  EPROM_SST_ID_Entry();
+  EPROM_SST_IDEntry();
   SCR_setAddress(0x00001);
   EPROM_readMode();
   ID = EPROM_readByte();
   EPROM_idleMode();
-  EPROM_SST_ID_Exit();
+  EPROM_SST_IDExit();
 
   return ID;
 }
