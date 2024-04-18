@@ -232,8 +232,10 @@ void SerialIO_Loop() {
         // Get manufacturer and device ID
         case GDEVID: {
           if (transferMode == ASCII) {
-            Serial.print(EPROM_SST_manufacturerID(), HEX);
-            Serial.print(EPROM_SST_deviceID(), HEX);
+            sprintf(strBuffer,"%02x%02x", EPROM_SST_manufacturerID(), EPROM_SST_deviceID());
+            Serial.print(strBuffer);
+            //Serial.print(EPROM_SST_manufacturerID(), HEX);
+            //Serial.print(EPROM_SST_deviceID(), HEX);
           }
           else {
             Serial.write(EPROM_SST_manufacturerID());
@@ -272,7 +274,8 @@ void SerialIO_Loop() {
         case RDBYTE: {
           SCR_setAddress(startAddr);
           if (transferMode == ASCII) {
-            Serial.print(EPROM_readByte(), HEX);
+            sprintf(strBuffer, "%02x", EPROM_readByte());
+            Serial.print(strBuffer);
           }
           else {
             Serial.write(EPROM_readByte());
@@ -375,14 +378,22 @@ bool SerialIO_writeBlock(bool suppressOutput) {
   uint32_t i = 0;
 
   for (uint32_t address = startAddr; address < startAddr + blockSize; address++) {
-    if (!suppressOutput) {
-      sprintf(strBuffer, "Writing %02x@%08lx", dataBuffer[i], address);
-    }
-
     // Write a byte of data to EPROM
     result = EPROM_SST_byteProgram(address, dataBuffer[i++]);
     
     if (!result) break;
+
+    if (!suppressOutput) {
+      uint8_t data = EPROM_readByte();
+
+      if (transferMode == ASCII) {
+        sprintf(strBuffer, "%02x", data);
+        Serial.print(strBuffer);
+      }
+      else {
+        Serial.write(data);
+      }
+    }
   }
 
   return result;
@@ -404,7 +415,8 @@ void SerialIO_readBlock(bool suppressOutput) {
     // Output the current data byte if needed
     if (!suppressOutput) {
       if (transferMode == ASCII) {
-        Serial.print(data, HEX);
+        sprintf(strBuffer, "%02x", data);
+        Serial.print(strBuffer);
       }
       else {
         Serial.write(data);
