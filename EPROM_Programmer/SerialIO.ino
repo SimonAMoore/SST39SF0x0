@@ -1,17 +1,17 @@
-static const char PROGRAM_TITLE[]     = "SST39SF0x0 Flash EPROM Programmer";
-static const char PROGRAM_COPYRIGHT[] = "(C) Simon Moore. All Rights Reserved";
-static const char PROGRAM_VERSION[]   = "Version 1.0.3";
-static const char PROGRAM_DATE[]      = "14th April 2024.";
+#define PROGRAM_TITLE     "SST39SF0x0 Flash EPROM Programmer"
+#define PROGRAM_COPYRIGHT "(C) Simon Moore. All Rights Reserved"
+#define PROGRAM_VERSION   "Version 1.0.3"
+#define PROGRAM_DATE      "14th April 2024."
 
-static const uint16_t STR_BUFFER_SIZE = 80;         // Size of temporary buffer for sprintf()
-static const uint32_t BAUD_RATE       = 115200;     // Serial port BAUD rate
-static const uint32_t SERIAL_TIMEOUT  = 10000;      // Command timeout length in milliseconds
-static const uint8_t  CMND_NUM        = 18;         // Number of commands in command list array
-static const uint8_t  CMD_BUFFER_SIZE = 8;          // Size of command data buffer
-static const uint32_t EEBANK_CHECK    = 0xaa55aa55; // DWORD confirmation for erase bank command
-static const uint32_t EEPROM_CHECK    = 0xa5a5a5a5; // DWORD confirmation for erase chip command
-static const char     ACK             = '@';        // Function success acknowledgment
-static const char     N_ACK           = '!';        // Function failure acknowledgment
+#define STR_BUFFER_SIZE   80         // Size of temporary buffer for sprintf()
+#define BAUD_RATE         115200     // Serial port BAUD rate
+#define SERIAL_TIMEOUT    10000      // Command timeout length in milliseconds
+#define CMND_NUM          18         // Number of commands in command list array
+#define CMD_BUFFER_SIZE   8          // Size of command data buffer
+#define EEBANK_CHECK      0xaa55aa55 // DWORD confirmation for erase bank command
+#define EEPROM_CHECK      0xa5a5a5a5 // DWORD confirmation for erase chip command
+#define ACK               '@'        // Function success acknowledgment
+#define N_ACK             '!'        // Function failure acknowledgment
 
 // List of serial protocol commands
 // ================================
@@ -67,10 +67,8 @@ uint8_t cmdBuffer[CMD_BUFFER_SIZE];   // Buffer for storing received data bytes
 enum TransferMode { BINARY, ASCII };  // Data transfer mode types
 TransferMode transferMode = ASCII;    // Current transfer mode
 
-enum PState { ERROR, IDLE, WAIT_CMD_B, WAIT_CMD_D, RECV_DBLOCK, CMD_RUN };  // State machine possible states
+enum PState { ERROR, IDLE, WAIT_CMD_B, WAIT_CMD_D, RECV_DBLOCK, CMD_RUN, TIMEOUT };  // State machine possible states
 PState pState = IDLE;   // Current program state
-
-uint32_t lastMillis = millis();   // 32 bit counter for timeout
 
 void SerialIO_Begin() {
   Serial.begin(BAUD_RATE, SERIAL_8N1);
@@ -82,7 +80,10 @@ void SerialIO_Begin() {
   Serial.println();
 }
 
+uint32_t lastMillis = millis();   // 32 bit counter for timeout
+
 void SerialIO_Loop() {
+
   switch(pState) {
     // Device error state.
     default:
@@ -150,19 +151,21 @@ void SerialIO_Loop() {
 
       // Process command data bytes from serial input
       do {
-        if (Serial.available() >0) {
+        if (Serial.available() > 0) {
           cmdBuffer[i++] = Serial.read();
         }
       } while (i < j && millis() - lastMillis < SERIAL_TIMEOUT);
 
       // If ASCII mode enabled convert data string to binary format
-      if (transferMode == ASCII) {
+      if (transferMode == ASCII && i == j) {
         for (i = 0; i < j; i+=2) {
           char byteStr[2] = { cmdBuffer[i], cmdBuffer[i + 1] };
           cmdBuffer[i >> 1] = strtol(byteStr, NULL, 16);
         }
       }
-      pState = CMD_RUN;
+
+      if (i == j) pState = CMD_RUN; else pState = TIMEOUT;
+
       break;
     }
 
@@ -189,7 +192,8 @@ void SerialIO_Loop() {
         }
       } while (j < blockSize && millis() - lastMillis < SERIAL_TIMEOUT);
 
-      pState = CMD_RUN;
+      if (j == blockSize) pState = CMD_RUN; else pState = TIMEOUT;
+
       break;
     }
 
@@ -280,7 +284,7 @@ void SerialIO_Loop() {
 
         // Read data block from current address
         case RDBLCK: {
-          SerialIO_readBlock(true);
+          SerialIO_readBlock(false);
           Serial.write(ACK);
           pState = IDLE;
           break;
@@ -332,7 +336,7 @@ void SerialIO_Loop() {
 
         // Return CRC32 hash value
         case GCRC32: {
-          Serial.println(CRC32_finalise());
+          Serial.print(CRC32_finalise());
           Serial.write(ACK);
           pState = IDLE;
           break;
@@ -349,7 +353,7 @@ void SerialIO_Loop() {
           // Get the SHA-1 final state
           SHA1_getState(&a, &b, &c, &d, &e);
           sprintf(strBuffer, "%08lx%08lx%08lx%08lx%08lx", a, b, c, d, e);
-          Serial.println(strBuffer);
+          Serial.print(strBuffer);
           Serial.write(ACK);
           pState = IDLE;
           break;
@@ -357,12 +361,12 @@ void SerialIO_Loop() {
       }
       break;
     }
-  }
 
-  // If timer exceeds timeout value, reset program state to idle
-  if (millis() - lastMillis > SERIAL_TIMEOUT) {
-    Serial.write('!');
-    pState = IDLE;
+    // If timer exceeds timeout value, reset program state to idle
+    case TIMEOUT: {
+      Serial.write('!');
+      pState = IDLE;
+    }
   }
 }
 
@@ -405,7 +409,6 @@ void SerialIO_readBlock(bool suppressOutput) {
       else {
         Serial.write(data);
       }
-      if ((address + 1) % blockSize == 0) Serial.write('@');
     }
 
     // Pulse clock of shift/counter register to increment counter

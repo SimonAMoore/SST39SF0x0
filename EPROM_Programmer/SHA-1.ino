@@ -6,7 +6,12 @@ uint32_t h3;
 uint32_t h4;
 
 // SHA-1 Constants, K0, K1, K2, and K3
-static const uint32_t k[4] = {0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6};
+#define k1 0x5a827999
+#define k2 0x6ed9eba1
+#define k3 0x8f1bbcdc
+#define k4 0xca62c1d6
+
+//static const uint32_t k[4] = {0x5a827999, 0x6ed9eba1, 0x8f1bbcdc, 0xca62c1d6};
 
 uint32_t  w[16];            // SHA-1 message 32-bit words, w0, w1, ..., w79
 uint8_t   sha1_buffer[64];  // SHA-1 512 bit message block
@@ -78,16 +83,16 @@ void SHA1_processBlock() {
 
     // Calculate SHA-1 temp value
     if (i < 20) {
-      temp = ROL32(a, 5) + CH(b, c, d)      + e + W(i) + k[0];
+      temp = ROL32(a, 5) + CH(b, c, d)      + e + W(i) + k1;
     }
     else if (i < 40) {
-      temp = ROL32(a, 5) + PARITY(b, c, d)  + e + W(i) + k[1];
+      temp = ROL32(a, 5) + PARITY(b, c, d)  + e + W(i) + k2;
     }
     else if (i < 60) {
-      temp = ROL32(a, 5) + MAJ(b, c, d)     + e + W(i) + k[2];
+      temp = ROL32(a, 5) + MAJ(b, c, d)     + e + W(i) + k3;
     }
     else {
-      temp = ROL32(a, 5) + PARITY(b, c, d)  + e + W(i) + k[3];
+      temp = ROL32(a, 5) + PARITY(b, c, d)  + e + W(i) + k4;
     }
 
     // Update working registers

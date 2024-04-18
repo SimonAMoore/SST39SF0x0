@@ -26,7 +26,7 @@
 //                 VSS(0V) -> | 16            17 | -> DQ3
 //                            +------------------+
 
-static const uint16_t POLL_COUNT = 0x7fff;
+#define POLL_COUNT 0x7fff
 
 void EPROM_SST_IDEntry() {
   SCR_setAddress(0x05555); EPROM_writeByte(0xaa);

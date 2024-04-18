@@ -1,8 +1,7 @@
-const uint8_t CLK   = A0; // Shift register clock output pin on Arduino UNO
-const uint8_t DATA  = A1; // Shift register data output pin on Arduino UNO
-const uint8_t MODE  = A2; // Shift register command output pin on Arduino Uno
-
-const uint32_t CLKT = 50; // Clock pulse width in microseconds
+#define CLK  A0 // Shift register clock output pin on Arduino UNO
+#define DATA A1 // Shift register data output pin on Arduino UNO
+#define MODE A2 // Shift register command output pin on Arduino Uno
+#define CLKT 50 // Clock pulse width in microseconds
 
 void SCR_setAddress(uint32_t address) {
   uint8_t bank = address >> 16;
@@ -38,15 +37,7 @@ void SCR_setAddress(uint8_t bank, uint16_t address) {
     // Pulse clock to signal shift register to read in data
     SCR_clockPulse();
   }
-
-  /*
-  Serial.print("Setting address bus: ");
-  Serial.print(bank, HEX);
-  Serial.print(":");
-  Serial.println(address, HEX);
-  delay(1000);
-  */
- }
+}
 
 void SCR_init() {
   // Set up shift/counter register control pins

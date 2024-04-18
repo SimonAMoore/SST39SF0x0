@@ -1,5 +1,6 @@
-const uint32_t CRC32_POLY = 0xedb88320; // Polynomial for calculating CRC-32 checksum
-      uint32_t crc32;
+#define CRC32_POLY 0xedb88320 // Polynomial for calculating CRC-32 checksum
+
+uint32_t crc32;
 
 void CRC32_init() {
   crc32 = 0xffffffff;

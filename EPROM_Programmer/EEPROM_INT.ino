@@ -1,15 +1,15 @@
-const uint8_t ROM_OE = A3;  // EPROM output enable, active low. G=0 Read mode, G=1 Write mode
-const uint8_t ROM_CE = A4;  // EPROM chip enable, active low. E=0, ROM enabled
-const uint8_t ROM_WE = A5;  // EPROM write enable, active low. 
+#define ROM_OE A3  // EPROM output enable, active low. G=0 Read mode, G=1 Write mode
+#define ROM_CE A4  // EPROM chip enable, active low. E=0, ROM enabled
+#define ROM_WE A5  // EPROM write enable, active low. 
 
-const uint8_t DQ0 = 4;  // EPROM data bit 0, pin PD4 Arduino UNO
-const uint8_t DQ1 = 5;  // EPROM data bit 1, pin PD5 Arduino UNO
-const uint8_t DQ2 = 6;  // EPROM data bit 2, pin PD6 Arduino UNO
-const uint8_t DQ3 = 7;  // EPROM data bit 3, pin PD7 Arduino UNO
-const uint8_t DQ4 = 8;  // EPROM data bit 4, pin PB0 Arduino UNO
-const uint8_t DQ5 = 9;  // EPROM data bit 5, pin PB1 Arduino UNO
-const uint8_t DQ6 = 10; // EPROM data bit 6, pin PB2 Arduino UNO
-const uint8_t DQ7 = 12; // EPROM data bit 7, pin PB4 Arduino UNO
+#define DQ0 4  // EPROM data bit 0, pin PD4 Arduino UNO
+#define DQ1 5  // EPROM data bit 1, pin PD5 Arduino UNO
+#define DQ2 6  // EPROM data bit 2, pin PD6 Arduino UNO
+#define DQ3 7  // EPROM data bit 3, pin PD7 Arduino UNO
+#define DQ4 8  // EPROM data bit 4, pin PB0 Arduino UNO
+#define DQ5 9  // EPROM data bit 5, pin PB1 Arduino UNO
+#define DQ6 10 // EPROM data bit 6, pin PB2 Arduino UNO
+#define DQ7 12 // EPROM data bit 7, pin PB4 Arduino UNO
 
 // Array to map Arduino Pins to EPROM data lines
 const uint8_t dataPins[8] = {DQ0, DQ1, DQ2, DQ3, DQ4, DQ5, DQ6, DQ7};

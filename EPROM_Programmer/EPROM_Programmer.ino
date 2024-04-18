@@ -20,14 +20,14 @@
 //        ROM_WE <- [  A5 ]                  [ RX  ] <- USB Data
 //
 
-static const uint8_t  STR_BUFFER_LEN  = 80;
-static const uint16_t DATA_BUFFER_LEN = 1024;
+#define STR_BUFFER_LEN   80
+#define DATA_BUFFER_LEN  1024
 
 uint32_t startAddr  = 0x00000;
 uint32_t endAddr    = 0x20000;
-uint16_t blockSize  = 0x0400;
+uint16_t blockSize  = DATA_BUFFER_LEN;
 
-char strBuffer[STR_BUFFER_LEN];       // String buffer for sprintf() function
+char    strBuffer[STR_BUFFER_LEN];    // String buffer for sprintf() function
 uint8_t dataBuffer[DATA_BUFFER_LEN];  // Data byte buffer for reading/writing EPROM
 
 void setup() {
@@ -44,9 +44,6 @@ void setup() {
 void loop() {
   // Process serial IO
   SerialIO_Loop();
-
-  // Delay for debuging
-  delay(25);
 }
 
 void HALT(String msg) {
