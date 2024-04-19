@@ -10,8 +10,8 @@
 #define CMD_BUFFER_SIZE   8          // Size of command data buffer
 #define EEBANK_CHECK      0xaa55aa55 // DWORD confirmation for erase bank command
 #define EEPROM_CHECK      0xa5a5a5a5 // DWORD confirmation for erase chip command
-#define ACK               '@'        // Function success acknowledgment
-#define N_ACK             '!'        // Function failure acknowledgment
+#define ACK               "@"        // Function success acknowledgment
+#define N_ACK             "!@"       // Function failure acknowledgment
 
 // List of serial protocol commands
 // ================================
@@ -36,7 +36,7 @@
 // GSHA_1  [G]    Get EPROM SHA-1       (0)   <- (char[40])            Calculate SHA-1 hash value of BYTE no. of banks
 // =====================================================================================================================================
 //
-// Acknowledge SUCCESS = '@', FAILURE = '!'
+// Acknowledge SUCCESS = '@', FAILURE = '!@'
 
 // Command_ID identifiers
 enum CmdID { SBINRY, SASCII, SDBLSZ, GDEVID, SSADDR, SEADDR, RDBYTE, RDBLCK, WDBLCK, EEBANK, EEPROM, GCRC32, GSHA_1 };
@@ -231,8 +231,6 @@ void SerialIO_Loop() {
           if (transferMode == ASCII) {
             sprintf(strBuffer,"%02x%02x", EPROM_SST_manufacturerID(), EPROM_SST_deviceID());
             Serial.print(strBuffer);
-            //Serial.print(EPROM_SST_manufacturerID(), HEX);
-            //Serial.print(EPROM_SST_deviceID(), HEX);
           }
           else {
             Serial.write(EPROM_SST_manufacturerID());
@@ -293,7 +291,7 @@ void SerialIO_Loop() {
         // Write data block to EPROM
         case WDBLCK: {
           bool result = SerialIO_writeBlock(false);
-          Serial.write(result ? ACK : N_ACK);
+          Serial.print(result ? ACK : N_ACK);
           pState = IDLE;
           break;
         }
@@ -310,7 +308,7 @@ void SerialIO_Loop() {
           }
 
           // Acknowledge success or failure
-          Serial.write(result ? ACK : N_ACK);
+          Serial.print(result ? ACK : N_ACK);
 
           pState = IDLE;
           break;
@@ -328,7 +326,7 @@ void SerialIO_Loop() {
           }
 
           // Acknowledge success or failure
-          Serial.write(result ? ACK : N_ACK);
+          Serial.print(result ? ACK : N_ACK);
 
           pState = IDLE;
           break;
@@ -364,7 +362,7 @@ void SerialIO_Loop() {
 
     // If timer exceeds timeout value, reset program state to idle
     case TIMEOUT: {
-      Serial.write('!');
+      Serial.print(N_ACK);
       pState = IDLE;
     }
   }

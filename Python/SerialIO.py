@@ -6,28 +6,33 @@ def readLine():
 
 def sendCommand(s: str) -> str:
     arduino.write(('z' + s).encode('utf-8'))
-    response = arduino.read(1).decode()
+    response = arduino.read(1).decode('utf-8')
     if (response == 'Z'):
         message = arduino.read_until(b'@').decode().strip('@')
     else:
-        message = b'ERROR'
+        message = b'!'
     return message
 
-arduino = serial.Serial(port='/dev/tty.usbmodem14101', baudrate=9600, timeout=10)
+arduino = serial.Serial(port='/dev/tty.usbmodem14101', baudrate=57600, timeout=11)
 
-# Read text lines to clear Arduino message text from serial output
+# Read text lines to clear Arduino message text from serial input
 readLine()
 readLine()
 readLine()
 readLine()
 readLine()
 readLine()
+
+deviceID = sendCommand('i')         # Get manufacturer and device id
+print('Device ID:' + deviceID)      # Print device id
 
 sendCommand('d0010')                # Set data block size to 16
 sendCommand('s00000000')            # Set start address to 0x00000000
 
-deviceID = sendCommand('i')         # Get manufacturer and device id
-print('Device ID:' + deviceID)      # Print device id
+# Print first 256 bytes of EPROM
+sendCommand('s00000000')            # Set start address to 0x00000000
+for i in range(16):
+    print(sendCommand("R"))         # Read and print 16-byte data block from EPROM
 
 sendCommand('Ea5a5a5a5')            # Send erase EPROM command
 
@@ -40,3 +45,5 @@ sendCommand('w'.ljust(33, '5'))     # Write 16 bytes of 0x55 to EPROM
 sendCommand('s00000000')            # Set start address to 0x00000000
 for i in range(16):
     print(sendCommand("R"))         # Read and print 16-byte data block from EPROM
+
+print(sendCommand('s0000000'))
