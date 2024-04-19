@@ -4,7 +4,7 @@
 #define PROGRAM_DATE      "14th April 2024."
 
 #define STR_BUFFER_SIZE   80         // Size of temporary buffer for sprintf()
-#define BAUD_RATE         9600       // Serial port BAUD rate
+#define BAUD_RATE         57600      // Serial port BAUD rate
 #define SERIAL_TIMEOUT    10000      // Command timeout length in milliseconds
 #define CMND_NUM          18         // Number of commands in command list array
 #define CMD_BUFFER_SIZE   8          // Size of command data buffer
@@ -59,8 +59,7 @@ Command cmdList[CMND_NUM] = { { 'b', 0, SBINRY}, { 'B', 0, SBINRY},
                               { 'e', 4, EEBANK}, { 'E', 4, EEPROM},
                               { 'g', 0, GCRC32}, { 'G', 0, GSHA_1} };
 
-int8_t cmdB = 0;    // Index of the current command being executed in command list
-int8_t cmdD = 0;    // No of bytes of data current command requires
+Command cmd = {};   // Command currently being processed
 
 uint8_t cmdBuffer[CMD_BUFFER_SIZE];   // Buffer for storing received data bytes
 
@@ -98,7 +97,7 @@ void SerialIO_Loop() {
         if (Serial.read() == 'z') {
           Serial.write('Z');          // Confirm handshake with 'Z'
           pState = WAIT_CMD_B;        // Set program state to WAIT_CMD_B (wait for command byte)
-          cmdB = 0;                   // Reset current command
+          cmd = {};                   // Reset current command
         }
       }
       lastMillis = millis();          // Reset timeout counter
@@ -117,10 +116,9 @@ void SerialIO_Loop() {
         // Parse command character
         for (uint8_t i = 0; i < CMND_NUM; i++) {
           if (c == cmdList[i].c) {
-            cmdB = cmdList[i].id;
-            cmdD = cmdList[i].d;
+            cmd = cmdList[i];
             // Set next program state based on command's data byte length (d)
-            switch (cmdD) {
+            switch (cmd.d) {
               // Default is to expect a series of data bytes of length d
               default:
                 pState = WAIT_CMD_D;
@@ -136,8 +134,7 @@ void SerialIO_Loop() {
                 pState = CMD_RUN;
                 break;
             }
-            // Break for loop
-            break;
+            break;  // Break for loop
           }
         }
       }
@@ -147,7 +144,7 @@ void SerialIO_Loop() {
     // Waiting for command data
     case WAIT_CMD_D: {
       uint8_t i = 0;
-      uint8_t j = (transferMode == ASCII) ? cmdD * 2 : cmdD;
+      uint8_t j = (transferMode == ASCII) ? cmd.d * 2 : cmd.d;
 
       // Process command data bytes from serial input
       do {
@@ -199,7 +196,7 @@ void SerialIO_Loop() {
 
     // Execute command function
     case CMD_RUN: {
-      switch(cmdB) {
+      switch(cmd.id) {
         // Command not recognized
         default:
           HALT("Illegal Command");
