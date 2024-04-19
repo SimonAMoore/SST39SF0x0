@@ -4,7 +4,7 @@
 #define PROGRAM_DATE      "14th April 2024."
 
 #define STR_BUFFER_SIZE   80         // Size of temporary buffer for sprintf()
-#define BAUD_RATE         115200     // Serial port BAUD rate
+#define BAUD_RATE         9600       // Serial port BAUD rate
 #define SERIAL_TIMEOUT    10000      // Command timeout length in milliseconds
 #define CMND_NUM          18         // Number of commands in command list array
 #define CMD_BUFFER_SIZE   8          // Size of command data buffer
