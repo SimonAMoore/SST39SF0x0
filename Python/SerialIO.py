@@ -45,5 +45,3 @@ sendCommand('w'.ljust(33, '5'))     # Write 16 bytes of 0x55 to EPROM
 sendCommand('s00000000')            # Set start address to 0x00000000
 for i in range(16):
     print(sendCommand("R"))         # Read and print 16-byte data block from EPROM
-
-print(sendCommand('s0000000'))
