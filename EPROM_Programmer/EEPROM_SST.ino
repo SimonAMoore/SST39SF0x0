@@ -100,6 +100,7 @@ bool EPROM_SST_dataPolling() {
 
   return result;
 }
+
 uint8_t EPROM_SST_manufacturerID() {
   uint8_t ID = 0;
 
