@@ -21,15 +21,15 @@
 //
 // CMD_ID  char   Function             Bytes  Input/Output             Description
 // =====================================================================================================================================
-// SBINRY  [b|B]  Set binary mode       (0)                            Set data transfer to binary mode
-// SASCII  [a|A]  Set ASCII mode        (0)                            Set data transfer to ASCII mode
-// SDBLSZ  [d|D]  Set data block size   (2)   -> (WORD <= 0x0400)      Set size of data block for binary data transfers (Up to 1KBytes)
-// GDEVID  [i|I]  Get device ID         (0)   <- (BYTE:BYTE)           Get the manufacturer and device ID for EPROM
+// SBINRY  [b]    Set binary mode       (0)                            Set data transfer to binary mode
+// SASCII  [a]    Set ASCII mode        (0)                            Set data transfer to ASCII mode
+// SDBLSZ  [d]    Set data block size   (2)   -> (WORD <= 0x0400)      Set size of data block for binary data transfers (Up to 1KBytes)
+// GDEVID  [i]    Get device ID         (0)   <- (BYTE:BYTE)           Get the manufacturer and device ID for EPROM
 // SSADDR  [s]    Set start address     (4)   -> (DWORD < 0x6ffff)     Set the start address for future commands (Resets hash funcions)
 // SEADDR  [S]    Set end address       (1)   -> (BYTE)                Set size of EPROM in 4K banks
 // RDBYTE  [r]    Read data byte        (0)   <- (BYTE)                Read EPROM byte from current address
 // RDBLCK  [R]    Read data block       (0)   <- (Data Block)          Read EPROM block from current bank-masked-address
-// WDBLCK  [w|W]  Write data block      (D)   -> (Data Block)          Write block of data starting at current address
+// WDBLCK  [w]    Write data block      (D)   -> (Data Block)          Write block of data starting at current address
 // EEBANK  [e]    Erase EPROM bank      (4)   -> (DWORD)               Erase single 4KB bank of EPROM at address if DWORD = 0xaa55aa55
 // EEPROM  [E]    Erase EPROM           (4)   -> (DWORD)               Erase entire EPROM if DWORD = 0xa5a5a5a5
 // GCRC32  [g]    Get EPROM CRC         (0)   <- (char[16])            Calculate CRC32 hash value of BYTE no. of banks
@@ -49,24 +49,29 @@ struct Command {
 };
 
 // List of serial protocol commands
-Command cmdList[CMND_NUM] = { { 'b', 0, SBINRY}, { 'B', 0, SBINRY},
-                              { 'a', 0, SASCII}, { 'A', 0, SASCII},
-                              { 'd', 2, SDBLSZ}, { 'D', 2, SDBLSZ},
-                              { 'i', 0, GDEVID}, { 'I', 0, GDEVID},
-                              { 's', 4, SSADDR}, { 'S', 1, SEADDR},
-                              { 'r', 0, RDBYTE}, { 'R', 0, RDBLCK},
-                              { 'w',-1, WDBLCK}, { 'W',-1, WDBLCK},
-                              { 'e', 4, EEBANK}, { 'E', 4, EEPROM},
-                              { 'g', 0, GCRC32}, { 'G', 0, GSHA_1} };
+Command cmdList[CMND_NUM] = { { 'b', 0, SBINRY},    // Command 'b', 0 data bytes, set data transfers to binary mode
+                              { 'a', 0, SASCII},    // Command 'a', 0 data bytes, set data transfers to ascii mode
+                              { 'd', 2, SDBLSZ},    // Command 'd', 2 data bytes, set data blocksize in bytes
+                              { 'i', 0, GDEVID},    // Command 'i', 0 data bytes, get manufacturer and device id
+                              { 's', 4, SSADDR},    // Command 's', 4 data bytes, set start address
+                              { 'S', 1, SEADDR},    // Command 'S', 1 data bytes, set size of EPROM in 4K banks
+                              { 'r', 0, RDBYTE},    // Command 'r', 0 data bytes, read byte from start address
+                              { 'R', 0, RDBLCK},    // Command 'R', 0 data bytes, read data block from start address
+                              { 'w',-1, WDBLCK},    // Command 'w', 1 data block, write data block to start address
+                              { 'e', 4, EEBANK},    // Command 'e', 4 data bytes, erase EPROM bank containing start address
+                              { 'E', 4, EEPROM},    // Command 'E', 4 data bytes, erase EPROM chip
+                              { 'g', 0, GCRC32},    // Command 'g', 0 data bytes, get CRC32 hash value
+                              { 'G', 0, GSHA_1}     // Command 'G', 0 data bytes, get SHA-1 hash value
+                            };
 
 Command cmd = {};   // Command currently being processed
 
 uint8_t cmdBuffer[CMD_BUFFER_SIZE];   // Buffer for storing received data bytes
 
-enum TransferMode { BINARY, ASCII };  // Data transfer mode types
+enum class TransferMode : uint8_t { BINARY, ASCII };  // Data transfer mode types
 TransferMode transferMode = ASCII;    // Current transfer mode
 
-enum PState { ERROR, IDLE, WAIT_CMD_B, WAIT_CMD_D, RECV_DBLOCK, CMD_RUN, TIMEOUT };  // State machine possible states
+enum class PState : uint8_t { ERROR, IDLE, WAIT_CMD_B, WAIT_CMD_D, RECV_DBLOCK, CMD_RUN, TIMEOUT };  // State machine possible states
 PState pState = IDLE;   // Current program state
 
 void SerialIO_Begin() {
