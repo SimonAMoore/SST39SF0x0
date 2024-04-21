@@ -39,7 +39,7 @@
 // Acknowledge SUCCESS = '@', FAILURE = '!@'
 
 // Command_ID identifiers
-enum CmdID { SBINRY, SASCII, SDBLSZ, GDEVID, SSADDR, SEADDR, RDBYTE, RDBLCK, WDBLCK, EEBANK, EEPROM, GCRC32, GSHA_1 };
+enum class CmdID : uint8_t { SBINRY, SASCII, SDBLSZ, GDEVID, SSADDR, SEADDR, RDBYTE, RDBLCK, WDBLCK, EEBANK, EEPROM, GCRC32, GSHA_1 };
 
 // Command structure
 struct Command {
